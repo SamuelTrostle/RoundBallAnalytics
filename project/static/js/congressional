@@ -38,7 +38,7 @@ var table = d3.select("#table-location")
     tbody = table.append("tbody");
 
 //DATA
-d3.csv("/static/Congressional1.csv", function (data) {
+d3.csv("/static/outputFile.csv", function (error, data) {
         data.forEach(function(d) {
             d.Date = parseDate(d.Date);
         });
@@ -199,7 +199,7 @@ d3.csv("/static/Congressional1.csv", function (data) {
 });
 
 //TABLE
-d3.csv("/static/Congressional2.csv", function(error, data){
+d3.csv("/static/Data2.csv", function(error, data){
 
     var columns = Object.keys(data[0])
 
@@ -251,7 +251,7 @@ var frontpageArea = d3.select("#svgCommittees")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-    d3.csv("/static/Congressional3.csv", function(error, data){
+    d3.csv("/static/Data3.csv", function(error, data){
 
         var ultimidati = d3.values(data[0])
             .filter(function (d, i) {
