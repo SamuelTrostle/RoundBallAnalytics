@@ -278,7 +278,7 @@ var frontpageArea = d3.select("#svgCommittees")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-    d3.csv("Data3.csv", function(error, data){
+    d3.csv("/static/Data3.csv", function(error, data){
 
         var ultimidati = d3.values(data[0])
             .filter(function (d, i) {
