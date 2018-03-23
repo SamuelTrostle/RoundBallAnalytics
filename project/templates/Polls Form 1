@@ -1,0 +1,21 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <title>Input Polls</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/FormStyle.css">
+  </head>
+
+  <body>
+    <h1>Input New Polls for Graph</h1>
+    <form method="POST" action="/data">
+      <input type="text" name="Date" placeholder="Date">
+      <input type="text" name="Democrat" placeholder="Democrat">
+      <input type="text" name="Republican" placeholder="Republican">
+      <input type="text" name="Source" placeholder="Source">
+      <input type="text" name="Headline" placeholder="Headline">
+
+
+      <input type="submit" name="Submit">
+    </form>
+  </body>
+</html>
