@@ -13,7 +13,7 @@ def check_password(hashed_password, user_password):
     return hashed_password == hashlib.md5(user_password.encode()).hexdigest()
 
 def validate(username, password):
-    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV7/db.roundball')
+    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV7/db.roundball', check_same_thread=False)
     completion = False
     with con:
                 c = con.cursor()
@@ -29,16 +29,20 @@ def validate(username, password):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    print('Begin function')
     error = None
     if request.method == 'POST':
+        print('Post method')
         username = request.form['username']
         password = request.form['password']
         completion = validate(username, password)
         if completion ==False:
             error = 'Invalid Credentials. Please try again.'
+            print('bad credits')
         else:
+            print('success')
             return redirect(url_for('secret'))
-    return render_template('login.html', error=error)
+    return render_template('loginForm.html', error=error)
 
 @app.route('/secret')
 def secret():
