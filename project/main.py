@@ -5,50 +5,43 @@ import hashlib
 import models as dbHandler
 app = Flask(__name__)
 
-# Connect to Database
-con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV7/db.roundball', check_same_thread=False)
-c = con.cursor()
 
-def check_password(hashed_password, user_password):
-    return hashed_password == hashlib.md5(user_password.encode()).hexdigest()
-
-def validate(username, password):
-    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV7/db.roundball', check_same_thread=False)
-    completion = False
-    with con:
-                c = con.cursor()
-                c.execute("SELECT * FROM Users")
-                rows = c.fetchall()
-                for row in rows:
-                    dbUser = row[0]
-                    dbPass = row[1]
-                    if dbUser==username:
-                        completion=check_password(dbPass, password)
-    return completion
-
-
+# Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    print('Begin function')
     error = None
     if request.method == 'POST':
-        print('Post method')
-        username = request.form['username']
-        password = request.form['password']
-        completion = validate(username, password)
-        if completion ==False:
-            error = 'Invalid Credentials. Please try again.'
-            print('bad credits')
+
+        # Check for Admin Priv
+        if request.form['username'] == 'admin' and request.form['password'] == 'admin':
+            return redirect(url_for('Admin'))
+
+        #Check for Guest Priv
+        elif request.form['username'] == 'guest' or request.form['password'] == 'guest':
+            return redirect(url_for('Guest'))
+
+        # Failed Login
         else:
-            print('success')
-            return redirect(url_for('secret'))
+            error = 'Invalid Credentials. Please try again.'
     return render_template('loginForm.html', error=error)
 
-@app.route('/secret')
-def secret():
-    return "You have successfully logged in"
 
-# ----------------------------------------------------------
+
+
+# Admin Login
+@app.route("/Admin")
+def Admin():
+    return render_template('index.html')
+
+# Guest Login
+@app.route("/Guest")
+def Guest():
+    return render_template('guest_index.html')
+
+
+# Connect to Database
+con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV8/db.RoundballV2', check_same_thread=False)
+c = con.cursor()
 
 @app.route('/data', methods=['GET', 'POST'])
 def data():
@@ -64,10 +57,10 @@ def data():
             (Date, Democrat, Republican, Source, Headline))
         con.commit()
         # Change table to dataframe
-        dataframe = pd.read_sql("SELECT * FROM CongressionalRace", con)
+        dataframe = pd.read_sql("SELECT * FROM conrace", con)
 
         # Change dataframe to CSV
-        dataframe.to_csv('/Users/Samuel Trostle/Desktop/RoundBallSiteV7/static/outputFile.csv', mode='w', sep=',',
+        dataframe.to_csv('/Users/Samuel Trostle/Desktop/RoundBallSiteV8/static/outputFile.csv', mode='w', sep=',',
                          index=False,
                          encoding='utf-8')
         return 'done'
@@ -76,12 +69,7 @@ def data():
         return render_template('PollsForm1.html')
 # Remove entry
 
-
-
-# Run main application
-@app.route("/")
-def main():
-    return render_template('index.html')
+# ---------------------------------------------------------------
 
 if __name__ == "__main__":
     app.run(debug=True)
