@@ -280,22 +280,30 @@ var frontpageArea = d3.select("#svgCommittees")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-    d3.csv("/static/Data3.csv", function(error, data){
+d3.csv("/static/conrace.csv", function(data) {
 
-        var ultimidati = d3.values(data[0])
-            .filter(function (d, i) {
-                return i === 0 || i === 1;});
 
-        var yesNo = ["Dem", "Rep"]
-        var avg = ["Five Day Rolling  Average"]
+       var topData = data.sort(function(a, b) {
+       return d3.descending(+a.Date, +b.Date);
+       }).slice(0, 5);
 
-        var frontpage = frontpageArea.selectAll(".frontpage")
-            .data(ultimidati)
-            .enter().append("g")
-            .attr("class", "frontpage")
-            .attr("transform", function (d, i) {
-              return "translate(" + i * 250 + ", 45)";
-            });
+
+ var totalSum = [
+    d3.mean(topData.map(function(d){ return d.Democrat})),
+    d3.mean(topData.map(function(d){ return d.Republican}))];
+
+ console.log(totalSum);
+
+       var yesNo = ["Dem", "Rep"]
+       var avg = ["Five Day Rolling  Average"]
+
+       var frontpage = frontpageArea.selectAll(".frontpage")
+           .data(totalSum)
+           .enter().append("g")
+           .attr("class", "frontpage")
+           .attr("transform", function (d, i) {
+             return "translate(" + i * 250 + ", 45)";
+           });
 
 
         frontpage.append("text")
