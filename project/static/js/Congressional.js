@@ -38,7 +38,7 @@ var table = d3.select("#table-location")
     tbody = table.append("tbody");
 
 //DATA
-d3.csv("/static/outputFile.csv", function (error, data) {
+d3.csv("/static/conrace.csv", function (error, data) {
         data.forEach(function(d) {
             d.Date = parseDate(d.Date);
         });
@@ -51,6 +51,7 @@ d3.csv("/static/outputFile.csv", function (error, data) {
     var sampleVar = 'Sample Subpopulation';
     var moeVar = 'MoE';
     var sponsorVar = 'Sponsor';
+    var IDVar = 'ID';
 
 
     var varVote = d3.keys(data[0])
@@ -61,7 +62,8 @@ d3.csv("/static/outputFile.csv", function (error, data) {
         .filter(function (key) { return key !== ratingVar;})
         .filter(function (key) { return key !== sampleVar;})
         .filter(function (key) { return key !== moeVar;})
-        .filter(function (key) { return key !== sponsorVar;});
+        .filter(function (key) { return key !== sponsorVar;})
+        .filter(function (key) { return key !== IDVar;});
 
     //COLOR DOMAIN
     color.domain(varVote);
@@ -211,7 +213,7 @@ d3.csv("/static/outputFile.csv", function (error, data) {
 });
 
 //TABLE
-d3.csv("/static/outputFile.csv", function(error, data) {
+d3.csv("/static/conrace.csv", function(error, data) {
 		  if (error) throw error;
 
 		  var sortAscending = true;
@@ -321,4 +323,4 @@ var frontpageArea = d3.select("#svgCommittees")
                 .style("fill", function (d) { return color(d) })
                 .style("font-size","36");
 
-        })
+})
