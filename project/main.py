@@ -22,22 +22,49 @@ def login():
             error = 'Invalid Credentials. Please try again.'
     return render_template('loginForm.html', error=error)
 
+
 # Admin Login
-@app.route("/Admin")
+@app.route("/admin")
 def Admin():
+    refresh()
     return render_template('index.html')
 
 # Guest Login
-@app.route("/Guest")
+@app.route("/guest")
 def Guest():
+    refresh()
     return render_template('guest_index.html')
 
-# ----------------------------------------------------------
 
+# --------------------------------------------------------
+
+
+
+# Reload the CSV
+def refresh():
+    # Connect to Database
+    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV9/db.roundball', check_same_thread=False)
+    c = con.cursor()
+
+    # Change table to dataframe
+    dataframe = pd.read_sql("SELECT * FROM conrace", con)
+
+    # Change dataframe to CSV
+    dataframe.to_csv('/Users/Samuel Trostle/Desktop/RoundBallSiteV9/static/conrace.csv', mode='w', sep=',',
+                     index=False,
+                     encoding='utf-8')
+    print('refreshed')
+
+
+
+# --------------------------------------------------------
+
+
+# Enter new data
 @app.route('/data', methods=['GET', 'POST'])
 def data():
     # Connect to Database
-    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV7/db.roundball', check_same_thread=False)
+    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV9/db.roundball', check_same_thread=False)
     c = con.cursor()
     if request.method == 'POST':
         Date = request.form.getlist('Date')[0]
@@ -50,18 +77,31 @@ def data():
             'INSERT INTO conrace (Date, Democrat, Republican, Source, Headline) VALUES (?, ?, ?, ?, ?)',
             (Date, Democrat, Republican, Source, Headline))
         con.commit()
-        # Change table to dataframe
-        dataframe = pd.read_sql("SELECT * FROM conrace", con)
-
-        # Change dataframe to CSV
-        dataframe.to_csv('/Users/Samuel Trostle/Desktop/RoundBallSiteV7/static/conrace.csv', mode='w', sep=',',
-                         index=False,
-                         encoding='utf-8')
+        refresh()
         return 'done'
     # return to index after seconds
     else:
         return render_template('PollsForm1.html')
+
+
+
+
 # Remove entry
+@app.route('/edit', methods=['GET', 'POST'])
+def delete():
+    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV9/db.roundball', check_same_thread=False)
+    c = con.cursor()
+    if request.method == 'POST':
+        ID = request.form.getlist('ID')[0]
+
+        c.execute("DELETE FROM conrace WHERE ID=?", (ID,))
+        con.commit()
+        refresh()
+        return render_template('index.html')
+
+    else:
+        return render_template('EditForm.html')
+
 
 
 
