@@ -39,7 +39,6 @@ def Guest():
 # --------------------------------------------------------
 
 
-
 # Reload the CSV
 def refresh():
     # Connect to Database
@@ -56,10 +55,7 @@ def refresh():
     print('refreshed')
 
 
-
 # --------------------------------------------------------
-
-
 # Enter new data
 @app.route('/data', methods=['GET', 'POST'])
 def data():
@@ -67,40 +63,36 @@ def data():
     con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV9/db.roundball', check_same_thread=False)
     c = con.cursor()
     if request.method == 'POST':
-        Date = request.form.getlist('Date')[0]
-        Democrat = request.form.getlist('Democrat')[0]
-        Republican = request.form.getlist('Republican')[0]
-        Source = request.form.getlist('Source')[0]
-        Headline = request.form.getlist('Headline')[0]
+        if 'Date' != '':
+            Date = request.form.getlist('Date')[0]
+            Democrat = request.form.getlist('Democrat')[0]
+            Republican = request.form.getlist('Republican')[0]
+            Source = request.form.getlist('Source')[0]
+            Headline = request.form.getlist('Headline')[0]
+            ID = request.form.getlist('ID')[0]
+            c.execute(
+                'INSERT INTO conrace (Date, Democrat, Republican, Source, Headline) VALUES (?, ?, ?, ?, ?)',
+                (Date, Democrat, Republican, Source, Headline))
 
-        c.execute(
-            'INSERT INTO conrace (Date, Democrat, Republican, Source, Headline) VALUES (?, ?, ?, ?, ?)',
-            (Date, Democrat, Republican, Source, Headline))
+        if 'ID' != '':
+            ID = request.form.getlist('ID')[0]
+            c.execute("DELETE FROM conrace WHERE ID=?", (ID,))
+
+    # Empty input fields still cause error
+
         con.commit()
         refresh()
-        return 'done'
+
+        return render_template('index.html')
     # return to index after seconds
     else:
         return render_template('PollsForm1.html')
 
 
 
-
-# Remove entry
-@app.route('/edit', methods=['GET', 'POST'])
-def delete():
-    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV9/db.roundball', check_same_thread=False)
-    c = con.cursor()
-    if request.method == 'POST':
-        ID = request.form.getlist('ID')[0]
-
-        c.execute("DELETE FROM conrace WHERE ID=?", (ID,))
-        con.commit()
-        refresh()
-        return render_template('index.html')
-
-    else:
-        return render_template('EditForm.html')
+@app.route("/fls")
+def florida_senate():
+    return render_template('FLSenate.html')
 
 
 
