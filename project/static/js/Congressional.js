@@ -214,48 +214,54 @@ d3.csv("/static/conrace.csv", function (error, data) {
 
 //TABLE
 d3.csv("/static/conrace.csv", function(error, data) {
-          if (error) throw error;
+		  if (error) throw error;
 
-          var sortAscending = true;
-          var table = d3.select('#page-wrap').append('table');
-          var titles = d3.keys(data[0]);
-          var headers = table.append('thead').append('tr')
-                           .selectAll('th')
-                           .data(titles).enter()
-                           .append('th')
-                       .style("background-color","#AAB3E8")
-                       .style("border-color","#AAB3E8")
-                           .text(function (d) {
-                                return d;
-                            })
-                           .on('click', function (d) {
-                               headers.attr('class', 'header');
+		  var sortAscending = true;
+		  var table = d3.select('#page-wrap').append('table');
+		  var titles = d3.keys(data[0]);
+      var topData = data.sort(function(a, b) {
+          var dateA=new Date(a.Date), dateB=new Date(b.Date)
+          return (dateB-dateA);
+        });
 
-                               if (sortAscending) {
-                                 rows.sort(function(a, b) { return b[d] < a[d]; });
-                                 sortAscending = false;
-                                 this.className = 'aes';
-                               } else {
-                                 rows.sort(function(a, b) { return b[d] > a[d]; });
-                                 sortAscending = true;
-                                 this.className = 'des';
-                               }
 
-                           });
+      var headers = table.append('thead').append('tr')
+               .selectAll('th')
+               .data(titles).enter()
+               .append('th')
+               .style("background-color","#AAB3E8")
+               .style("border-color","#AAB3E8")
+               .text(function (d) {
+                  return d;
+                })
+               .on('click', function (d) {
+            	   headers.attr('class', 'header');
 
-          var rows = table.append('tbody').selectAll('tr')
-                       .data(data).enter()
-                       .append('tr');
-          rows.selectAll('td')
-            .data(function (d) {
-                return titles.map(function (k) {
-                    return { 'value': d[k], 'name': k};
-                });
-            }).enter()
-            .append('td')
-            .attr('data-th', function (d) {
-                return d.name;
-            })
+            	   if (sortAscending) {
+            	     rows.sort(function(a, b) { return b[d] < a[d]; });
+            	     sortAscending = false;
+            	     this.className = 'aes';
+            	   } else {
+            		 rows.sort(function(a, b) { return b[d] > a[d]; });
+            		 sortAscending = true;
+            		 this.className = 'des';
+            	   }
+
+               });
+
+		  var rows = table.append('tbody').selectAll('tr')
+		               .data(data).enter()
+		               .append('tr');
+		  rows.selectAll('td')
+		    .data(function (d) {
+		    	return titles.map(function (k) {
+		    		return { 'value': d[k], 'name': k};
+		    	});
+		    }).enter()
+		    .append('td')
+		    .attr('data-th', function (d) {
+		    	return d.name;
+		    })
         .on("mouseover", function(d){
             d3.select(this)
                 .style("background-color", "rgba(170,179,232,.7)");
@@ -264,10 +270,10 @@ d3.csv("/static/conrace.csv", function(error, data) {
             d3.select(this)
                 .style("background-color","#FFFFFF");
         })
-            .text(function (d) {
-                return d.value;
-            });
-      });
+		    .text(function (d) {
+		    	return d.value;
+		    });
+	  });
 
 
 //LAST DATA
@@ -280,30 +286,30 @@ var frontpageArea = d3.select("#svgCommittees")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-d3.csv("/static/conrace.csv", function(data) {
+    d3.csv("/static/conrace.csv", function(data) {
 
 
-       var topData = data.sort(function(a, b) {
-       return d3.descending(+a.Date, +b.Date);
-       }).slice(0, 5);
+      var topData = data.sort(function(a, b) {
+        var dateA=new Date(a.Date), dateB=new Date(b.Date)
+        return (dateB-dateA);
+        }).slice(0, 5);
 
 
- var totalSum = [
-    d3.mean(topData.map(function(d){ return d.Democrat})),
-    d3.mean(topData.map(function(d){ return d.Republican}))];
+  var totalSum = [
+     d3.mean(topData.map(function(d){ return d.Democrat})),
+     d3.mean(topData.map(function(d){ return d.Republican}))];
 
- console.log(totalSum);
 
-       var yesNo = ["Dem", "Rep"]
-       var avg = ["Five Day Rolling  Average"]
+        var yesNo = ["Dem", "Rep"]
+        var avg = ["Five Day Rolling  Average"]
 
-       var frontpage = frontpageArea.selectAll(".frontpage")
-           .data(totalSum)
-           .enter().append("g")
-           .attr("class", "frontpage")
-           .attr("transform", function (d, i) {
-             return "translate(" + i * 250 + ", 45)";
-           });
+        var frontpage = frontpageArea.selectAll(".frontpage")
+            .data(totalSum)
+            .enter().append("g")
+            .attr("class", "frontpage")
+            .attr("transform", function (d, i) {
+              return "translate(" + i * 250 + ", 45)";
+            });
 
 
         frontpage.append("text")
@@ -331,4 +337,4 @@ d3.csv("/static/conrace.csv", function(data) {
                 .style("fill", function (d) { return color(d) })
                 .style("font-size","36");
 
-})
+        })
