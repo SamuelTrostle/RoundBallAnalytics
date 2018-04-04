@@ -1,3 +1,4 @@
+# Imports
 from flask import Flask, render_template, redirect, url_for, request, g
 import csv, sqlite3
 import pandas as pd
@@ -22,11 +23,10 @@ def login():
             error = 'Invalid Credentials. Please try again.'
     return render_template('loginForm.html', error=error)
 
-
 # Admin Login
 @app.route("/admin")
 def Admin():
-    refresh()
+    # refresh()
     return render_template('index.html')
 
 # Guest Login
@@ -34,10 +34,6 @@ def Admin():
 def Guest():
     refresh()
     return render_template('guest_index.html')
-
-
-# --------------------------------------------------------
-
 
 # Reload the CSV
 def refresh():
@@ -55,7 +51,6 @@ def refresh():
     print('refreshed')
 
 
-# --------------------------------------------------------
 # Enter new data
 @app.route('/data', methods=['GET', 'POST'])
 def data():
@@ -78,6 +73,13 @@ def data():
             ID = request.form.getlist('ID')[0]
             c.execute("DELETE FROM conrace WHERE ID=?", (ID,))
 
+        elif 'ID' != '' and 'Date' 'Democrat' 'Republican' 'Source' 'Headline' == '':
+            ID = request.form.getlist('ID')[0]
+            c.execute("DELETE FROM conrace WHERE ID=?", (ID,))
+
+        c.execute("DELETE FROM conrace WHERE Date = ''")
+
+
     # Empty input fields still cause error
 
         con.commit()
@@ -89,12 +91,17 @@ def data():
         return render_template('PollsForm1.html')
 
 
+# Florida
+@app.route('/fl', methods=['GET', 'POST'])
+def fl():
+    # refresh()
+    return render_template('/states/FLSenate.html')
 
-@app.route("/fls")
-def florida_senate():
-    return render_template('FLSenate.html')
-
-
+# Virginia
+@app.route('/va', methods=['GET', 'POST'])
+def va():
+    # refresh()
+    return render_template('/states/VASenate.html')
 
 
 # Run main application
