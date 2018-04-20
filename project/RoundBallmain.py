@@ -2,44 +2,42 @@
 from flask import Flask, render_template, redirect, url_for, request, g
 import csv, sqlite3
 import pandas as pd
+
 app = Flask(__name__)
 
-# Login
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['POST', 'GET'])
 def login():
-    error = None
+    return render_template('national_congress.html')
+
+
+state_page = {
+    'fls':'florida_senate.html', 'vas':'virginia_senate.html', 'national':'national_congress.html'
+}
+
+@app.route('/<state_name>')
+def index(state_name):
+    return render_template(state_page[state_name])
+
+
+# Access Input
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+
     if request.method == 'POST':
+        admin = request.form.getlist('admin')[0]
 
-        # Check for Admin Priv
-        if request.form['username'] == 'admin' and request.form['password'] == 'admin':
-            return redirect(url_for('Admin'))
-
-        #Check for Guest Priv
-        elif request.form['username'] == 'guest' or request.form['password'] == 'guest':
-            return redirect(url_for('Guest'))
-
-        # Failed Login
+        if admin == 'root':
+            return render_template('PollsForm1.html')
         else:
-            error = 'Invalid Credentials. Please try again.'
-    return render_template('loginForm.html', error=error)
-
-# Admin Login
-@app.route("/admin")
-def Admin():
-    # refresh()
-    return render_template('index.html')
-
-# Guest Login
-@app.route("/guest")
-def Guest():
-    refresh()
-    return render_template('guest_index.html')
+            return render_template('AdminPass.html')
+    else:
+        return render_template('AdminPass.html')
 
 # Enter new data
 @app.route('/data', methods=['GET', 'POST'])
 def data():
     # Connect to Database
-    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV9/db.roundball', check_same_thread=False)
+    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV1.0/db.roundball', check_same_thread=False)
     c = con.cursor()
 
     if request.method == 'POST':
@@ -70,11 +68,11 @@ def data():
             c.execute('INSERT INTO {} (Date, Democrat, Republican, Source, Headline) VALUES (?, ?, ?, ?, ?)'
                       .format(table), (Date, Field1, Field2, Source, Headline))
 
-        elif 'ID' != '':
+        if 'ID' != '':
             ID = request.form.getlist('ID')[0]
             c.execute("DELETE FROM {} WHERE ID=?".format(table), (ID,))
 
-        elif 'ID' != '' and 'Date' 'Democrat' 'Republican' 'Source' 'Headline' == '':
+        if 'ID' != '' and 'Date' 'Democrat' 'Republican' 'Source' 'Headline' == '':
             ID = request.form.getlist('ID')[0]
             c.execute("DELETE FROM {} WHERE ID=?".format(table), (ID,))
 
@@ -85,11 +83,11 @@ def data():
         dataframe = pd.read_sql("SELECT * FROM {}".format(table), con)
 
         # Change dataframe to CSV
-        dataframe.to_csv('/Users/Samuel Trostle/Desktop/RoundBallSiteV9/static/states/{}/{}.csv'.format(State,table),
+        dataframe.to_csv('/Users/Samuel Trostle/Desktop/RoundBallSiteV1.0/static/states/{}/{}.csv'.format(State, table),
                          mode='w', sep=',', index=False, encoding='utf-8')
         print('refreshed')
 
-        return render_template('index.html')
+        return render_template('/states/{}.html'.format(table))
 
     else:
         return render_template('PollsForm1.html')
@@ -98,7 +96,7 @@ def data():
 @app.route('/VAdata', methods=['GET', 'POST'])
 def VAdata():
     # Connect to Database
-    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV9/db.roundball', check_same_thread=False)
+    con = sqlite3.connect('C:/Users/Samuel Trostle/Desktop/RoundBallSiteV1.0/db.roundball', check_same_thread=False)
     c = con.cursor()
 
     if request.method == 'POST':
@@ -142,32 +140,15 @@ def VAdata():
         dataframe = pd.read_sql("SELECT * FROM {}".format(table), con)
 
         # Change dataframe to CSV
-        dataframe.to_csv('/Users/Samuel Trostle/Desktop/RoundBallSiteV9/static/states/{}/{}.csv'.format(State,table),
+        dataframe.to_csv('/Users/Samuel Trostle/Desktop/RoundBallSiteV1.0/static/states/{}/{}.csv'.format(State,table),
                          mode='w', sep=',', index=False, encoding='utf-8')
         print('refreshed')
 
-        return render_template('index.html')
+        return render_template('national_congress.html')
 
     else:
-        return render_template('PollsFormVA.html')
+        return render_template('/other/PollsFormVA.html')
 
-# Florida
-@app.route('/fl', methods=['GET', 'POST'])
-def fl():
-    # refresh()
-    return render_template('/states/FLSenate.html')
-
-# Virginia
-@app.route('/va', methods=['GET', 'POST'])
-def va():
-    # refresh()
-    return render_template('/states/VASenate.html')
-
-
-# Run main application
-@app.route("/")
-def main():
-    return render_template('guest_index.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
